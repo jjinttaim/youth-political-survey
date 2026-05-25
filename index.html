@@ -1049,10 +1049,10 @@ function selectSelf(i) {
 function renderJoinSecond() {
   setProgress("2차 실험 안내", 95);
 
-  // 민사고가 아니면 2차 실험 단계 건너뛰고 바로 결과
+  // 민사고가 아니면 2차 실험 단계 건너뛰고 결과 보기 화면으로
   if (state.schoolType !== "민사") {
     state.joinSecond = false;
-    return renderResult();
+    return renderPreResult();
   }
 
   transitionTo(`
@@ -1122,6 +1122,15 @@ function computeResult() {
   };
 }
 
+function categoryRangeText(cat) {
+  return {
+    "진보":    "평균 0 ~ 2.5 구간 · 진보",
+    "중도진보": "평균 2.5 ~ 5 구간 · 중도진보",
+    "중도보수": "평균 5 ~ 7.5 구간 · 중도보수",
+    "보수":    "평균 7.5 ~ 10 구간 · 보수",
+  }[cat];
+}
+
 function categoryColor(cat) {
   return {
     "진보":   "#3b82f6",
@@ -1129,6 +1138,56 @@ function categoryColor(cat) {
     "중도보수":"#d946ef",
     "보수":   "#ef4444",
   }[cat];
+}
+
+function renderPreResult() {
+  setProgress("결과 준비 완료", 98);
+  transitionTo(`
+    <div class="q-card thanks-wrap" style="position:relative;">
+      <div class="hero-orb a" style="opacity:.3;"></div>
+      <div class="hero-orb b" style="opacity:.3;"></div>
+
+      <div class="thanks-emoji">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+      </div>
+      <h1 style="margin-bottom:10px;">설문에 참여해주셔서 감사합니다.</h1>
+      <p class="lead" style="text-align:center;">
+        17개 문항의 응답이 정상적으로 제출되었습니다. <br/>
+        아래 <strong style="color:var(--text);">결과 보기</strong> 버튼을 클릭하시면, <br/>
+        본인의 정치 성향 결과를 확인하실 수 있습니다.
+      </p>
+
+      <div class="info-grid" style="margin-top: 24px; text-align:left;">
+        <div class="info-card">
+          <div class="label">점수 산정 방식</div>
+          <div class="value small">
+            진보 <strong>0점</strong> · 중도진보 <strong>3.3점</strong><br/>
+            중도보수 <strong>6.7점</strong> · 보수 <strong>10점</strong><br/>
+            17문항의 <strong>평균값</strong>으로 산출
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="label">성향 판정 구간</div>
+          <div class="value small">
+            <span style="color:#60a5fa;">●</span> 0 ~ 2.5 &nbsp;&nbsp; 진보<br/>
+            <span style="color:#a78bfa;">●</span> 2.5 ~ 5 &nbsp;&nbsp; 중도진보<br/>
+            <span style="color:#e879f9;">●</span> 5 ~ 7.5 &nbsp;&nbsp; 중도보수<br/>
+            <span style="color:#f87171;">●</span> 7.5 ~ 10 &nbsp; 보수
+          </div>
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top: 28px;">
+        <span></span>
+        <button class="btn btn-primary" onclick="renderResult()" style="font-size: 16px; padding: 16px 28px;">
+          내 정치 성향 결과 보기
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  `);
 }
 
 function renderResult() {
@@ -1156,10 +1215,13 @@ function renderResult() {
 
       <div class="result-spectrum">
         <div class="result-headline">
-          <div class="score">YOUR RESULT</div>
+          <div class="score">YOUR RESULT · 당신의 정치 성향은</div>
           <div class="label" style="background: linear-gradient(90deg, #fff, ${categoryColor(r.cat)});
             -webkit-background-clip:text; background-clip:text; color:transparent;">${r.cat}</div>
-          <div class="meta">평균 점수 <strong>${r.avg.toFixed(2)} / 10</strong> · 본인 인식 <strong>${escapeHtml(selfLabel)}</strong></div>
+          <div class="meta">17문항 평균 <strong>${r.avg.toFixed(2)} / 10</strong> · 본인 인식 <strong>${escapeHtml(selfLabel)}</strong></div>
+          <div style="margin-top:10px; font-size:12px; color:var(--text-dim); letter-spacing:0.02em;">
+            ${categoryRangeText(r.cat)}
+          </div>
         </div>
 
         <div class="spectrum-bar" style="margin-top:24px;">
@@ -1336,7 +1398,7 @@ function next() {
     if (state.schoolType === "민사" && state.joinSecond === true) {
       return renderThanks();
     } else {
-      return renderResult();
+      return renderPreResult();
     }
   }
 }
@@ -1361,6 +1423,8 @@ window.selectSelf = selectSelf;
 window.selectJoin = selectJoin;
 window.submitSchool = submitSchool;
 window.copyShareText = copyShareText;
+window.renderResult = renderResult;
+window.renderPreResult = renderPreResult;
 
 /* boot */
 renderIntro();
