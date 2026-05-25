@@ -1259,13 +1259,6 @@ function renderResult() {
         <p>본 결과는 연구의 일부로만 사용되며, 응답자의 익명성이 보장됩니다. 결과는 정치 성향에 대한 절대적 판정이 아닌, <strong>17개 문항 응답의 통계적 평균</strong>임을 알려드립니다.</p>
       </div>
 
-      <div class="actions" style="margin-top:24px;">
-        <span></span>
-        <button class="btn btn-primary" onclick="copyShareText()">
-          결과 텍스트 복사
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-        </button>
-      </div>
     </div>
   `);
 
@@ -1294,20 +1287,6 @@ function renderSelfCompareText(cat, selfLabel) {
     return `본인이 인식하시는 정치 성향(<strong>${escapeHtml(selfLabel)}</strong>)과 1차 검사 결과(<strong>${escapeHtml(cat)}</strong>)가 <strong>가까운 편</strong>입니다.`;
   }
   return `본인이 인식하시는 정치 성향(<strong>${escapeHtml(selfLabel)}</strong>)과 1차 검사 결과(<strong>${escapeHtml(cat)}</strong>) 사이에 다소 차이가 있습니다. 본인이 평소 어떤 가치를 중요하게 여기는지 돌아보는 계기가 될 수 있겠네요.`;
-}
-
-function copyShareText() {
-  const r = computeResult();
-  const txt = `[「24시간!」 1차 검사 결과]
-정치 성향: ${r.cat} (${r.avg.toFixed(2)}/10)
-· 사회: ${r.bySection.society.toFixed(2)}
-· 경제: ${r.bySection.economy.toFixed(2)}
-· 안보: ${r.bySection.security.toFixed(2)}`;
-  navigator.clipboard.writeText(txt).then(() => {
-    showToast("결과 텍스트가 복사되었습니다.");
-  }).catch(() => {
-    showToast("복사에 실패했습니다.");
-  });
 }
 
 function showToast(msg) {
@@ -1422,7 +1401,6 @@ window.selectOption = selectOption;
 window.selectSelf = selectSelf;
 window.selectJoin = selectJoin;
 window.submitSchool = submitSchool;
-window.copyShareText = copyShareText;
 window.renderResult = renderResult;
 window.renderPreResult = renderPreResult;
 
