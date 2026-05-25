@@ -73,3 +73,17 @@ function doGet() {
     .createTextOutput(JSON.stringify({ ok: true, msg: '24h survey endpoint alive' }))
     .setMimeType(ContentService.MimeType.JSON);
 }
+
+/**
+ * ⚠ 처음 배포 후 반드시 한 번 실행하세요.
+ *
+ * Apps Script 에디터에서 함수 선택 드롭다운으로 `authorize`를 골라
+ * [실행] 버튼을 누르면 권한 동의 화면이 뜹니다. 동의하면 doPost가
+ * 외부에서도 시트에 쓸 수 있게 됩니다.
+ */
+function authorize() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
+  Logger.log('Sheet ready: ' + sheet.getName());
+}
