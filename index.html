@@ -579,6 +579,13 @@
 
 <script>
 /* ============================================================
+ *  설정 — 응답을 저장할 Google Apps Script Web App URL
+ *  비워두면 응답은 어디에도 전송되지 않습니다.
+ *  설정 방법은 apps-script/Code.gs 파일 상단 주석 참고.
+ * ============================================================ */
+const WEBHOOK_URL = ""; // 예: "https://script.google.com/macros/s/AKfycb..../exec"
+
+/* ============================================================
  *  데이터 정의
  * ============================================================ */
 
@@ -1096,6 +1103,41 @@ function selectJoin(v) {
 /* ============================================================
  *  결과 계산 & 화면
  * ============================================================ */
+
+// 응답을 Google Sheets로 전송 (단 한 번만)
+let _submitted = false;
+function submitToSheet() {
+  if (_submitted) return;
+  if (!WEBHOOK_URL || !/^https?:\/\//.test(WEBHOOK_URL)) return;
+  _submitted = true;
+
+  const r = computeResult();
+  const payload = {
+    school: state.school,
+    studentId: state.studentId,
+    // 각 문항의 '점수' 자체를 저장 (0 / 3.3 / 6.7 / 10)
+    answers: QUESTIONS.map((q, i) => q.opts[state.answers[i]].s),
+    avg: Number(r.avg.toFixed(3)),
+    category: r.cat,
+    bySection: {
+      society:  Number(r.bySection.society.toFixed(3)),
+      economy:  Number(r.bySection.economy.toFixed(3)),
+      security: Number(r.bySection.security.toFixed(3)),
+    },
+    selfIdeology: state.selfIdeology !== null ? IDEOLOGY_OPTIONS[state.selfIdeology].label : null,
+    joinSecond: state.joinSecond,
+  };
+
+  try {
+    fetch(WEBHOOK_URL, {
+      method: "POST",
+      // Content-Type을 명시하지 않아 CORS preflight를 피하고,
+      // Apps Script 쪽에서는 e.postData.contents 로 그대로 받습니다.
+      body: JSON.stringify(payload),
+    }).catch(() => {});
+  } catch (_) {}
+}
+
 function computeResult() {
   // 17문항 점수 평균
   let sum = 0;
@@ -1141,6 +1183,7 @@ function categoryColor(cat) {
 }
 
 function renderPreResult() {
+  submitToSheet();
   setProgress("결과 준비 완료", 98);
   transitionTo(`
     <div class="q-card thanks-wrap" style="position:relative;">
@@ -1319,6 +1362,7 @@ function showToast(msg) {
 }
 
 function renderThanks() {
+  submitToSheet();
   setProgress("완료", 100);
   transitionTo(`
     <div class="q-card thanks-wrap">
