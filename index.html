@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>24시간! · 청소년 정치 성향 설문조사</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #07070d;
+    --bg-1: #0e0e1a;
+    --bg-2: #15162a;
+    --line: rgba(255,255,255,0.08);
+    --line-strong: rgba(255,255,255,0.16);
+    --text: #e9ecf3;
+    --text-soft: #b8bccc;
+    --text-dim: #7a7f93;
+    --accent: #8b8df0;
+    --progressive: #3b82f6;
+    --moderate: #a855f7;
+    --conservative: #ef4444;
+    --shadow: 0 30px 80px -20px rgba(0,0,0,0.6);
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    color: var(--text);
+    background: var(--bg-0);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Background ambience */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 15% 10%, rgba(59,130,246,0.18), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 85% 15%, rgba(239,68,68,0.14), transparent 60%),
+      radial-gradient(ellipse 60% 60% at 50% 100%, rgba(168,85,247,0.18), transparent 60%),
+      linear-gradient(180deg, #06060c 0%, #0a0a18 100%);
+    z-index: -2;
+  }
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 30%, transparent 80%);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .app {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 24px 20px 80px;
+  }
+
+  /* Top brand bar */
+  .brand {
+    width: 100%;
+    max-width: 720px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0 28px;
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+  .brand-left {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .brand-mark {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, #3b82f6, #a855f7 50%, #ef4444);
+    box-shadow: 0 6px 20px rgba(59,130,246,0.35);
+    display: grid; place-items: center;
+    font-weight: 800; color: #fff; font-size: 12px;
+  }
+  .brand-name { color: var(--text); font-weight: 600; letter-spacing: 0.01em; }
+  .brand-name span { color: var(--text-dim); font-weight: 400; }
+  .brand-right { font-variant-numeric: tabular-nums; }
+
+  /* Card / screen */
+  .screen {
+    width: 100%;
+    max-width: 720px;
+    background: linear-gradient(180deg, rgba(20,21,40,0.85), rgba(14,14,26,0.85));
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(20px) saturate(120%);
+    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    padding: 18px 24px 0;
+  }
+  .progress-meta {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--text-dim);
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
+  }
+  .progress-track {
+    height: 4px; background: rgba(255,255,255,0.06);
+    border-radius: 999px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #a855f7, #ef4444);
+    width: 0%;
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .body {
+    padding: 36px 32px 32px;
+  }
+  @media (max-width: 560px) {
+    .body { padding: 28px 22px 22px; }
+  }
+
+  /* Typography */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600;
+    color: var(--text-soft);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .eyebrow .dot {
+    width: 6px; height: 6px; border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+  }
+  .eyebrow.cat-society .dot { background: #60a5fa; box-shadow: 0 0 12px #60a5fa; }
+  .eyebrow.cat-economy .dot { background: #f59e0b; box-shadow: 0 0 12px #f59e0b; }
+  .eyebrow.cat-security .dot { background: #34d399; box-shadow: 0 0 12px #34d399; }
+
+  h1 {
+    font-size: 32px; line-height: 1.25;
+    font-weight: 800; letter-spacing: -0.02em;
+    margin: 0 0 16px;
+  }
+  h2 {
+    font-size: 22px; line-height: 1.4;
+    font-weight: 700; letter-spacing: -0.01em;
+    margin: 0 0 24px;
+  }
+  .lead {
+    color: var(--text-soft);
+    font-size: 15px; line-height: 1.7;
+    margin: 0 0 24px;
+  }
+
+  /* Hero */
+  .hero-title {
+    font-size: 44px; line-height: 1.1;
+    font-weight: 800; letter-spacing: -0.03em;
+    margin: 6px 0 18px;
+  }
+  .hero-title .grad {
+    background: linear-gradient(90deg, #60a5fa 0%, #c084fc 50%, #f87171 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  @media (max-width: 560px) {
+    .hero-title { font-size: 34px; }
+    h1 { font-size: 26px; }
+    h2 { font-size: 19px; }
+  }
+
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    margin-bottom: 22px;
+  }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--text-soft);
+    background: rgba(255,255,255,0.02);
+  }
+  .chip strong { color: var(--text); font-weight: 600; }
+
+  .info-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin: 18px 0 28px;
+  }
+  @media (max-width: 560px) { .info-grid { grid-template-columns: 1fr; } }
+  .info-card {
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.02);
+  }
+  .info-card .label {
+    font-size: 11px; color: var(--text-dim);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .info-card .value {
+    font-size: 15px; color: var(--text); font-weight: 500;
+  }
+  .info-card .value.small { font-size: 13px; }
+
+  .privacy-note {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 14px 16px;
+    border: 1px dashed var(--line-strong);
+    border-radius: 12px;
+    background: rgba(139,141,240,0.04);
+    margin-bottom: 28px;
+  }
+  .privacy-note svg {
+    flex-shrink: 0;
+    color: var(--accent);
+  }
+  .privacy-note p {
+    margin: 0; font-size: 13px; line-height: 1.65;
+    color: var(--text-soft);
+  }
+
+  /* Inputs */
+  .field {
+    margin-bottom: 18px;
+  }
+  .field label {
+    display: block;
+    font-size: 13px; font-weight: 600;
+    color: var(--text); margin-bottom: 8px;
+    letter-spacing: 0.01em;
+  }
+  .field label .req {
+    color: #f87171; margin-left: 4px;
+  }
+  .field input[type="text"], .field select {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: inherit;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .field input[type="text"]:focus, .field select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(139,141,240,0.06);
+    box-shadow: 0 0 0 4px rgba(139,141,240,0.12);
+  }
+  .field .hint {
+    font-size: 12px; color: var(--text-dim); margin-top: 6px;
+  }
+
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: ""; position: absolute; right: 18px; top: 50%;
+    width: 8px; height: 8px;
+    border-right: 1.5px solid var(--text-soft);
+    border-bottom: 1.5px solid var(--text-soft);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+
+  /* Options (questions) */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    position: relative;
+    padding: 16px 18px 16px 50px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.02);
+    color: var(--text-soft);
+    font-size: 15px; line-height: 1.55;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    user-select: none;
+  }
+  .option:hover {
+    border-color: var(--line-strong);
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+    transform: translateY(-1px);
+  }
+  .option::before {
+    content: "";
+    position: absolute; left: 16px; top: 50%;
+    transform: translateY(-50%);
+    width: 20px; height: 20px;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 999px;
+    transition: all 0.2s;
+  }
+  .option::after {
+    content: "";
+    position: absolute; left: 22px; top: 50%;
+    transform: translateY(-50%) scale(0);
+    width: 8px; height: 8px;
+    background: #fff;
+    border-radius: 999px;
+    transition: transform 0.2s;
+  }
+  .option.selected {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(139,141,240,0.16), rgba(139,141,240,0.06));
+    color: var(--text);
+    box-shadow: 0 0 0 1px rgba(139,141,240,0.5), 0 10px 30px -10px rgba(139,141,240,0.4);
+  }
+  .option.selected::before {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+  .option.selected::after { transform: translateY(-50%) scale(1); }
+
+  /* Buttons */
+  .actions {
+    display: flex; gap: 10px;
+    margin-top: 28px;
+    justify-content: space-between;
+  }
+  .btn {
+    padding: 14px 22px;
+    border-radius: 12px;
+    font-size: 15px; font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    border: 1px solid transparent;
+    display: inline-flex; align-items: center; gap: 8px;
+    letter-spacing: 0.01em;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    box-shadow: 0 10px 30px -10px rgba(139,92,246,0.6),
+                inset 0 1px 0 rgba(255,255,255,0.18);
+  }
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 40px -10px rgba(139,92,246,0.7),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+  .btn-primary:disabled {
+    opacity: 0.4; cursor: not-allowed; transform: none;
+    box-shadow: none;
+  }
+  .btn-ghost {
+    background: rgba(255,255,255,0.03);
+    border-color: var(--line-strong);
+    color: var(--text-soft);
+  }
+  .btn-ghost:hover {
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+  }
+  .btn-block { width: 100%; justify-content: center; }
+
+  /* Q transition */
+  .q-card { animation: fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Result screen */
+  .result-spectrum {
+    margin: 24px 0 28px;
+    padding: 24px 22px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgba(255,255,255,0.02);
+  }
+  .spectrum-bar {
+    position: relative;
+    height: 14px;
+    border-radius: 999px;
+    background: linear-gradient(90deg,
+      #3b82f6 0%, #3b82f6 25%,
+      #8b5cf6 25%, #8b5cf6 50%,
+      #d946ef 50%, #d946ef 75%,
+      #ef4444 75%, #ef4444 100%);
+    margin: 14px 0 12px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+  }
+  .spectrum-marker {
+    position: absolute; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 26px; height: 26px;
+    border-radius: 999px;
+    background: #fff;
+    border: 3px solid #0e0e1a;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.9), 0 8px 22px rgba(0,0,0,0.6);
+    transition: left 1.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .spectrum-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--text-dim);
+    letter-spacing: 0.04em;
+    margin-top: 4px;
+  }
+  .spectrum-labels span { flex: 1; text-align: center; }
+  .spectrum-labels span:first-child { text-align: left; }
+  .spectrum-labels span:last-child { text-align: right; }
+
+  .result-headline {
+    text-align: center;
+    margin: 8px 0 0;
+  }
+  .result-headline .score {
+    font-size: 13px; color: var(--text-dim);
+    letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .result-headline .label {
+    font-size: 48px; font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 6px 0 4px;
+    background: linear-gradient(90deg, #fff, #c7c8e0);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .result-headline .meta {
+    color: var(--text-soft);
+    font-size: 14px;
+  }
+  .result-headline .meta strong { color: var(--text); }
+
+  .breakdown {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin: 24px 0 20px;
+  }
+  @media (max-width: 560px) { .breakdown { grid-template-columns: 1fr; } }
+  .breakdown-card {
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.02);
+  }
+  .breakdown-card .name {
+    font-size: 12px; color: var(--text-dim);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .breakdown-card .val {
+    font-size: 22px; font-weight: 700; letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  .mini-bar {
+    height: 6px; border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    position: relative; overflow: hidden;
+  }
+  .mini-bar > i {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: linear-gradient(90deg, #3b82f6, #a855f7, #ef4444);
+    border-radius: 999px;
+    width: 0%;
+    transition: width 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .self-compare {
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.02);
+    color: var(--text-soft);
+    font-size: 14px; line-height: 1.65;
+    margin-bottom: 8px;
+  }
+  .self-compare strong { color: var(--text); }
+
+  /* Yes screen */
+  .thanks-wrap {
+    text-align: center; padding: 12px 0;
+  }
+  .thanks-emoji {
+    width: 84px; height: 84px;
+    border-radius: 999px;
+    margin: 0 auto 20px;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(139,92,246,0.18));
+    border: 1px solid rgba(139,141,240,0.4);
+    box-shadow: 0 20px 50px -10px rgba(139,92,246,0.4);
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 22px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+  .footer a { color: var(--text-soft); text-decoration: none; }
+
+  /* Hidden helper */
+  .hidden { display: none !important; }
+
+  /* small flourish on hero */
+  .hero-orb {
+    position: absolute;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  .hero-orb.a { top: -90px; right: -60px; background: radial-gradient(circle, #ef4444 0%, transparent 70%); }
+  .hero-orb.b { bottom: -100px; left: -60px; background: radial-gradient(circle, #3b82f6 0%, transparent 70%); }
+
+  /* Loader dots */
+  .submit-loader { display: inline-flex; gap: 4px; align-items: center; }
+  .submit-loader i {
+    width: 6px; height: 6px; border-radius: 999px;
+    background: #fff; opacity: 0.4;
+    animation: dotp 1.2s infinite ease-in-out;
+  }
+  .submit-loader i:nth-child(2) { animation-delay: 0.15s; }
+  .submit-loader i:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes dotp {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1.1); }
+  }
+
+  /* radio group styled like options but smaller for ideology */
+  .radio-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .radio-grid .option { padding-left: 50px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Brand bar -->
+  <div class="brand">
+    <div class="brand-left">
+      <div class="brand-mark">24</div>
+      <div class="brand-name">24시간! <span>· 청소년 정치 성향 연구</span></div>
+    </div>
+    <div class="brand-right" id="brandClock">민족사관고등학교</div>
+  </div>
+
+  <!-- Main card -->
+  <main class="screen" id="screen">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="progressLabel">시작 전</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <div class="body" id="body"></div>
+  </main>
+
+  <div class="footer">
+    조사기관 · 민족사관고등학교 주제탐구 팀 「24시간!」 (김예준 · 송경은 · 임성후 · 임유진) · 지도교사 김상래
+    <br/>웹사이트 제작 및 기술 지원 : 심재민
+  </div>
+</div>
+
+<script>
+/* ============================================================
+ *  데이터 정의
+ * ============================================================ */
+
+// 점수: 진보 0 / 중도진보 3.3 / 중도보수 6.7 / 보수 10
+const S = { L: 0, ML: 3.3, MC: 6.7, C: 10 };
+
+// 질문지 (PDF 기반). 카테고리: society / economy / security
+// 각 옵션의 score는 진보→보수 방향
+const QUESTIONS = [
+  /* ============ <사회> ============ */
+  {
+    cat: "society", catLabel: "사회 · Society", num: 1, total: 17, tag: "성평등",
+    q: "현재 사회에서 성평등은 얼마나 실현되었다고 생각하십니까?",
+    opts: [
+      { t: "여전히 성차별이 존재하므로, 이를 해결하기 위한 정책을 더욱 확대해야 한다.", s: S.L },
+      { t: "대부분의 분야에서 성차별은 사라졌다고 본다.", s: S.ML },
+      { t: "성평등은 거의 실현되었으므로 관련 정책은 점차 줄여 나가야 한다.", s: S.MC },
+      { t: "현 사회는 오히려 남성에 대한 역차별이 발생하는 사회이며, 여성에게 유리한 정책은 폐지해야 한다.", s: S.C },
+    ]
+  },
+  {
+    cat: "society", catLabel: "사회 · Society", num: 2, total: 17, tag: "성소수자",
+    q: "성소수자에 대하여 어떻게 생각하십니까?",
+    opts: [
+      { t: "법적 권리를 보장하고 사회 구성원으로서 받아들여야 한다.", s: S.L },
+      { t: "사회적으로는 인정하지만 법·제도화는 어려움이 있다고 본다.", s: S.ML },
+      { t: "개인적인 삶은 존중하지만 나와는 다른 세계의 사람들로 인식된다.", s: S.MC },
+      { t: "사회를 무너뜨리는 존재로, 절대 용인할 수 없다.", s: S.C },
+    ]
+  },
+  {
+    cat: "society", catLabel: "사회 · Society", num: 3, total: 17, tag: "언론",
+    q: "언론의 사회적 책임(오보 및 왜곡 보도 방지)과 언론의 자유(표현의 자유 및 권력 감시) 중, 어느 가치를 정부나 사회가 더 우선하여 추구해야 한다고 생각하십니까?",
+    opts: [
+      { t: "무책임한 보도로 인한 사회적 혼란과 개인의 피해를 막기 위해, 왜곡 보도를 강력하게 제재해야 한다.", s: S.L },
+      { t: "언론의 자유도 중요하지만, 공공성을 해치는 가짜뉴스의 폐해가 너무 크므로 공익적 책임에 더 무게를 두어야 한다.", s: S.ML },
+      { t: "언론의 기능이 위축될 수 있으니, 직접적 개입보다는 내부 규제나 시장의 선택에 맡기는 편이 낫다.", s: S.MC },
+      { t: "어떤 형태의 인위적 규제도 배격하고 언론 시장의 자율성에 전적으로 맡겨야 한다.", s: S.C },
+    ]
+  },
+  {
+    cat: "society", catLabel: "사회 · Society", num: 4, total: 17, tag: "장애인",
+    q: "장애인의 이동권 시위에 대하여 어떻게 생각하십니까?",
+    opts: [
+      { t: "주장하는 내용과 방법 모두 정당하다고 생각한다.", s: S.L },
+      { t: "장애인이 겪는 불편은 이해하지만, 시위의 방법이 잘못되었다고 본다.", s: S.ML },
+      { t: "현존하는 문제점은 인정하지만 요구가 과하다고 생각한다.", s: S.MC },
+      { t: "불법적인 시위이므로 공권력을 투입해 강경하게 진압해야 한다.", s: S.C },
+    ]
+  },
+  {
+    cat: "society", catLabel: "사회 · Society", num: 5, total: 17, tag: "교육 · 입시",
+    q: "현재 우리나라의 교육 체계가 어느 가치에 초점을 맞춰야 한다고 생각하십니까?",
+    opts: [
+      { t: "특목/자사고를 폐지하고 사교육 의존을 해소해야 하며, 모든 학생에게 평등한 교육 환경을 만들어야 한다.", s: S.L },
+      { t: "특목/자사고처럼 특정 계층에게만 유리한 구조는 점진적으로 축소하고, 다양한 활동이 공교육 안에서 보장되어야 한다.", s: S.ML },
+      { t: "특목/자사고는 유지하되 입시 부담은 줄이고, 다양한 전형을 통해 학생을 평가해야 한다.", s: S.MC },
+      { t: "특목/자사고처럼 수준별 교육을 강화하고, 치열한 입시 경쟁도 실력을 검증하는 공정한 과정이다.", s: S.C },
+    ]
+  },
+  {
+    cat: "society", catLabel: "사회 · Society", num: 6, total: 17, tag: "할당제",
+    q: "할당제(지역·여성·수입 등 어떤 대상에 대해 일정 비율 이상의 '할당'을 규정하는 제도)에 대해 어떻게 생각하십니까?",
+    opts: [
+      { t: "오랜 구조적 차별의 대상에 대한 의무 배정을 법적으로 규정해야 진정한 평등이 실현된다.", s: S.L },
+      { t: "단기적으로 기회 균등을 이루기 위한 수단으로는 유효하지만, 장기적으로는 할당제 없이도 평등한 사회를 만들어야 한다.", s: S.ML },
+      { t: "할당제로 인한 역차별 문제가 발생할 수 있으므로, 할당보다는 교육과 지원을 통해 격차를 줄이는 방식이 바람직하다.", s: S.MC },
+      { t: "집단 특성으로 기회를 배분하는 것은 공정하지 않으며, 모든 사람은 개인의 능력에 따라 경쟁해야 한다.", s: S.C },
+    ]
+  },
+  {
+    cat: "society", catLabel: "사회 · Society", num: 7, total: 17, tag: "환경 · 개발",
+    q: "경제 성장을 위한 개발에 따르는 환경 문제에 대하여 어떻게 생각하십니까?",
+    opts: [
+      { t: "당장의 경제 성장이 침체되더라도 환경 보호를 우선시해야 한다.", s: S.L },
+      { t: "지속 가능한 발전을 목표로 하는 방식을 정부가 채택해야 한다.", s: S.ML },
+      { t: "환경을 고려해야 하나, 경제적 이익이 환경 파괴보다 더욱 중요하게 고려되어야 한다.", s: S.MC },
+      { t: "환경오염은 경제 성장을 도모할 때 고려 대상이 아니다.", s: S.C },
+    ]
+  },
+  {
+    cat: "society", catLabel: "사회 · Society", num: 8, total: 17, tag: "비정규직",
+    q: "비정규직 노동자에 대한 정책에 대해 어떻게 생각하십니까?",
+    opts: [
+      { t: "장기적으로 비정규직을 모두 없애야 한다. 정규직/비정규직 간 임금 및 지위 차이를 최소화할 필요가 있다.", s: S.L },
+      { t: "비정규직에 대한 규제 및 정규직 전환 기조는 찬성하나, 점진적인 전환 정책이 필요하다.", s: S.ML },
+      { t: "인위적 전환보다는 비정규직 노동자의 처우를 개선해 노동시장의 이동성을 높여야 한다.", s: S.MC },
+      { t: "노동시장의 유연성을 확보해 기업 스스로 일자리를 늘리도록 해야 한다.", s: S.C },
+    ]
+  },
+
+  /* ============ <경제> ============ */
+  {
+    cat: "economy", catLabel: "경제 · Economy", num: 9, total: 17, tag: "지원금",
+    q: "긴급재난지원금/민생회복소비쿠폰 등 현금 지급 지원금 정책에 대해 어떻게 생각하십니까?",
+    opts: [
+      { t: "소득 양극화 해소와 취약계층의 기본권 보장을 위해 전 국민에게 지급해야 한다.", s: S.L },
+      { t: "경기 침체기에는 지급하되, 국가 재정 부담을 고려해 하위 계층만 지원하거나 업종 제한형 방식을 취해야 한다.", s: S.ML },
+      { t: "일시적 효과에 그치고 물가 상승의 위험이 있으므로 지양해야 한다. 가계보다 기업의 활력을 높이는 데 재정을 써야 한다.", s: S.MC },
+      { t: "포퓰리즘 정책이자 미래 세대에 빚을 넘기는 무책임한 재정 지출이다. 지원금 정책을 전면 중단해야 한다.", s: S.C },
+    ]
+  },
+  {
+    cat: "economy", catLabel: "경제 · Economy", num: 10, total: 17, tag: "기본소득",
+    q: "사회 구성원 모두에게 최소 생활비를 지급하는 제도인 기본소득제에 대해 어떻게 생각하십니까?",
+    opts: [
+      { t: "기본소득제를 적극 도입해야 한다.", s: S.L },
+      { t: "재정 부담을 고려해 점진적으로 시행해야 한다.", s: S.ML },
+      { t: "현 복지를 보완하는 것이 우선이다.", s: S.MC },
+      { t: "경제를 무너뜨릴 수 있으므로 절대 도입해서는 안 된다.", s: S.C },
+    ]
+  },
+  {
+    cat: "economy", catLabel: "경제 · Economy", num: 11, total: 17, tag: "부동산",
+    q: "다주택자(1가구 1주택 초과)에 대해 정부가 어떤 정책을 추진해야 한다고 생각하십니까?",
+    opts: [
+      { t: "주택의 공공성을 위해 법적·제도적으로 다주택을 강하게 제한해야 한다.", s: S.L },
+      { t: "사유재산은 인정하되, 높은 세금을 부과하여 간접적으로 규제해야 한다.", s: S.ML },
+      { t: "세금과 규제를 완화하여 시장 기능을 회복하되, 투기 과열을 막기 위한 최소한의 안전장치는 필요하다.", s: S.MC },
+      { t: "사유재산권 보호와 규제 철폐를 통해 시장이 스스로 공급과 가격을 조절하게 해야 한다.", s: S.C },
+    ]
+  },
+  {
+    cat: "economy", catLabel: "경제 · Economy", num: 12, total: 17, tag: "최저임금",
+    q: "최저임금 인상에 대하여 어떻게 생각하십니까?",
+    opts: [
+      { t: "정부는 최저임금을 대폭 인상하고, 이를 감당하기 어려운 소상공인에게도 별도의 지원책을 마련해 주어야 한다.", s: S.L },
+      { t: "경제성장률과 물가상승률을 합리적으로 반영하여 감당 가능한 수준에서 점진적으로 인상해야 한다.", s: S.ML },
+      { t: "최저임금 인상을 최대한 억제하고, 업종별 특성을 고려해 차등 적용해야 한다.", s: S.MC },
+      { t: "최저임금은 장기적으로 경제 및 노동 시장에 부정적인 영향을 미치므로 불필요하다.", s: S.C },
+    ]
+  },
+  {
+    cat: "economy", catLabel: "경제 · Economy", num: 13, total: 17, tag: "부의 재분배",
+    q: "대기업 및 고소득층에게 부과하는 소득세율을 더 인상하는 것에 대해 어떻게 생각하십니까?",
+    opts: [
+      { t: "사회적 부를 과도하게 독점한 주체들이 공익을 위해 더 많은 세금을 부담하는 것은 당연한 사회적 책임이다.", s: S.L },
+      { t: "증세가 필요하지만, 과세 표준 구간을 정비해 초고소득층 위주로 과세를 강화해야 한다.", s: S.ML },
+      { t: "세율을 무작정 올리기보다 비과세·감면 혜택을 정비해야 한다.", s: S.MC },
+      { t: "기업 및 고소득층이 우리나라를 이탈해 경제가 무너질 수 있으므로 절대 인상해서는 안 된다.", s: S.C },
+    ]
+  },
+
+  /* ============ <안보 / 외교> ============ */
+  {
+    cat: "security", catLabel: "안보 · Security", num: 14, total: 17, tag: "외교 · 전쟁",
+    q: "전쟁에 대하여 어떻게 생각하십니까?",
+    opts: [
+      { t: "절대 정당화될 수 없다.", s: S.L },
+      { t: "옳다고 생각하진 않지만 불가피한 면이 있다.", s: S.ML },
+      { t: "가끔은 정당한 전쟁도 존재한다.", s: S.MC },
+      { t: "자국의 이익을 위해서라면 하나의 수단으로 써야 한다.", s: S.C },
+    ]
+  },
+  {
+    cat: "security", catLabel: "안보 · Security", num: 15, total: 17, tag: "한미동맹",
+    q: "앞으로 한미동맹의 방향성에 대해 어떻게 생각하십니까?",
+    opts: [
+      { t: "미국 중심의 외교에서 벗어나 독자적인 외교를 지향해야 한다.", s: S.L },
+      { t: "한미동맹보다 국익에 따른 다자주의 외교를 펼쳐야 한다.", s: S.ML },
+      { t: "한미동맹은 우리 안보의 근간이므로, 기존의 전통적 군사 안보 동맹을 기조로 안정적으로 유지해야 한다.", s: S.MC },
+      { t: "급변하는 국제 정세 속에서 한미동맹을 더욱 강화해야 한다.", s: S.C },
+    ]
+  },
+  {
+    cat: "security", catLabel: "안보 · Security", num: 16, total: 17, tag: "평화 vs 국익",
+    q: "국제사회의 평화와 자국의 이익 중에 어떤 것을 더 우선시하십니까?",
+    opts: [
+      { t: "자국의 이익을 희생하더라도 항상 국제사회의 평화를 우선시한다.", s: S.L },
+      { t: "비교적 국제사회의 평화를 우선시한다.", s: S.ML },
+      { t: "비교적 자국의 이익을 우선시한다.", s: S.MC },
+      { t: "타국의 상황과 무관하게 항상 자국의 이익을 우선시한다.", s: S.C },
+    ]
+  },
+  {
+    cat: "security", catLabel: "안보 · Security", num: 17, total: 17, tag: "대북정책",
+    q: "정부의 북한 지원 관련 정책에 대해 어떻게 생각하십니까?",
+    opts: [
+      { t: "매우 적극적인 문화/경제적 교류 및 지원이 필요하다.", s: S.L },
+      { t: "경제 지원은 남북 간 대화의 창구를 열기 위한 효과적 유인이다.", s: S.ML },
+      { t: "어느 정도의 소통은 필요하나 경제 지원에는 회의적이다.", s: S.MC },
+      { t: "절대로 문화·경제적 교류 및 지원을 해서는 안 된다.", s: S.C },
+    ]
+  },
+];
+
+const IDEOLOGY_OPTIONS = [
+  { label: "진보", val: 0 },
+  { label: "중도에 가까운 진보", val: 1 },
+  { label: "중도", val: 2 },
+  { label: "중도에 가까운 보수", val: 3 },
+  { label: "보수", val: 4 },
+];
+
+/* ============================================================
+ *  상태
+ * ============================================================ */
+const state = {
+  step: 0,
+  // step 0: intro
+  // step 1: 소속 / 학번
+  // step 2..18: 17 questions (step-2 = question index)
+  // step 19: 본인 정치 성향
+  // step 20: 2차 실험 참가 의사
+  // step 21: 결과 (아니오) / 감사 (예)
+  answers: new Array(QUESTIONS.length).fill(null),
+  school: "",
+  schoolType: "", // "민사" or "기타"
+  studentId: "",
+  selfIdeology: null,
+  joinSecond: null,
+  finalCategory: null,
+};
+
+const $body = document.getElementById("body");
+const $progressFill = document.getElementById("progressFill");
+const $progressLabel = document.getElementById("progressLabel");
+const $progressPct = document.getElementById("progressPct");
+
+/* ============================================================
+ *  유틸
+ * ============================================================ */
+function setProgress(label, pct) {
+  $progressLabel.textContent = label;
+  $progressPct.textContent = Math.round(pct) + "%";
+  $progressFill.style.width = pct + "%";
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+function transitionTo(html) {
+  $body.style.opacity = 0;
+  $body.style.transform = "translateY(8px)";
+  setTimeout(() => {
+    $body.innerHTML = html;
+    $body.style.transition = "opacity .35s ease, transform .35s ease";
+    requestAnimationFrame(() => {
+      $body.style.opacity = 1;
+      $body.style.transform = "translateY(0)";
+    });
+  }, 200);
+}
+
+/* ============================================================
+ *  렌더링
+ * ============================================================ */
+function renderIntro() {
+  setProgress("시작 전", 0);
+  transitionTo(`
+    <div class="q-card" style="position:relative;">
+      <div class="hero-orb a"></div>
+      <div class="hero-orb b"></div>
+      <div class="eyebrow"><span class="dot"></span> 주제탐구 1차 검사</div>
+      <h1 class="hero-title">청소년의 정치 성향 <br/><span class="grad">스펙트럼을 그리다.</span></h1>
+      <p class="lead">
+        안녕하세요, 주제탐구 팀 <strong>「24시간!」</strong> 입니다.<br/>
+        본 설문은 청소년의 정치 진영 인식과 정치 성향에 따른 언어 사용의 차이를
+        주제로 진행되는 연구의 1차 검사입니다.
+      </p>
+
+      <div class="meta-row">
+        <span class="chip">총 <strong>&nbsp;17&nbsp;</strong> 문항</span>
+        <span class="chip">소요 시간 <strong>&nbsp;5–7분</strong></span>
+        <span class="chip">사회 8 · 경제 5 · 안보 4</span>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="label">연구 주제</div>
+          <div class="value small">청소년의 정치 진영 인식과 정치 성향에 따른 언어 사용</div>
+        </div>
+        <div class="info-card">
+          <div class="label">2차 실험</div>
+          <div class="value small">5월 30일 또는 31일 · 약 30분 · 익명 오픈채팅방</div>
+        </div>
+      </div>
+
+      <div class="privacy-note">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <p>본 설문조사를 포함한 연구 전반에서 수집한 정보는 <strong>연구 이외의 목적으로 사용되지 않으며,</strong> 응답자의 <strong>익명성이 보장됨</strong>을 알려드립니다.</p>
+      </div>
+
+      <div class="actions">
+        <span></span>
+        <button class="btn btn-primary" onclick="next()">
+          설문 시작하기
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  `);
+}
+
+function renderSchool() {
+  setProgress("응답자 정보", 5);
+  transitionTo(`
+    <div class="q-card">
+      <div class="eyebrow"><span class="dot"></span> Step 1 of 4 · 응답자 정보</div>
+      <h2>먼저, 소속을 알려주세요.</h2>
+      <p class="lead" style="margin-bottom:22px;">민족사관고등학교 학생의 경우, 상품 지급 및 추후 2차 실험 진행 시 연락을 위해 학번을 추가로 입력해 주세요. <br/><span style="color:var(--text-dim);">(외부 학생은 학번 입력 없이 진행됩니다.)</span></p>
+
+      <div class="field">
+        <label>소속 학교 <span class="req">*</span></label>
+        <div class="select-wrap">
+          <select id="schoolSelect">
+            <option value="">— 소속 학교를 선택해주세요 —</option>
+            <option value="민사">민족사관고등학교</option>
+            <option value="기타">기타 (외부 학생)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="extraFields"></div>
+
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="prev()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"/></svg>
+          이전
+        </button>
+        <button class="btn btn-primary" id="contBtn" onclick="submitSchool()" disabled>
+          다음으로
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  `);
+
+  setTimeout(() => {
+    const sel = document.getElementById("schoolSelect");
+    const extra = document.getElementById("extraFields");
+    const cont = document.getElementById("contBtn");
+    if (state.schoolType) sel.value = state.schoolType;
+
+    const updateState = () => {
+      const v = sel.value;
+      state.schoolType = v;
+      if (v === "민사") {
+        state.school = "민족사관고등학교";
+        extra.innerHTML = `
+          <div class="field">
+            <label>학번 <span class="req">*</span></label>
+            <input type="text" id="sid" inputmode="numeric" placeholder="예: 25030" maxlength="6" value="${escapeHtml(state.studentId)}" />
+            <div class="hint">학번은 상품 지급 및 2차 실험 연락 목적 외에는 사용되지 않습니다.</div>
+          </div>
+        `;
+        const sid = document.getElementById("sid");
+        sid.addEventListener("input", () => {
+          state.studentId = sid.value.trim();
+          cont.disabled = !state.studentId;
+        });
+        cont.disabled = !state.studentId;
+      } else if (v === "기타") {
+        extra.innerHTML = `
+          <div class="field">
+            <label>학교명 <span class="req">*</span></label>
+            <input type="text" id="schoolName" placeholder="예: OO고등학교" value="${escapeHtml(state.school)}" />
+          </div>
+        `;
+        const sn = document.getElementById("schoolName");
+        sn.addEventListener("input", () => {
+          state.school = sn.value.trim();
+          cont.disabled = !state.school;
+        });
+        cont.disabled = !state.school;
+      } else {
+        extra.innerHTML = "";
+        cont.disabled = true;
+      }
+    };
+    sel.addEventListener("change", updateState);
+    updateState();
+  }, 230);
+}
+
+function submitSchool() {
+  next();
+}
+
+function renderQuestion(qIdx) {
+  const q = QUESTIONS[qIdx];
+  const total = QUESTIONS.length;
+  const pct = 10 + ((qIdx + 1) / total) * 70;
+  setProgress(`${q.catLabel} · ${q.num} / ${total}`, pct);
+
+  const selected = state.answers[qIdx];
+
+  transitionTo(`
+    <div class="q-card">
+      <div class="eyebrow cat-${q.cat}"><span class="dot"></span> ${escapeHtml(q.catLabel)} · ${q.num}번 / 총 ${total}문항 <span style="color:var(--text-dim); margin-left:6px;">· #${escapeHtml(q.tag)}</span></div>
+      <h2>${escapeHtml(q.q)}</h2>
+
+      <div class="options" id="opts">
+        ${q.opts.map((o, i) => `
+          <div class="option ${selected !== null && state.answers[qIdx] === i ? 'selected' : ''}" data-i="${i}" onclick="selectOption(${qIdx}, ${i})">
+            ${escapeHtml(o.t)}
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="prev()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"/></svg>
+          이전
+        </button>
+        <button class="btn btn-primary" id="contBtn" onclick="next()" ${state.answers[qIdx] === null ? 'disabled' : ''}>
+          다음
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  `);
+}
+
+function selectOption(qIdx, optIdx) {
+  state.answers[qIdx] = optIdx;
+  document.querySelectorAll("#opts .option").forEach((el, i) => {
+    el.classList.toggle("selected", i === optIdx);
+  });
+  const contBtn = document.getElementById("contBtn");
+  if (contBtn) contBtn.disabled = false;
+  // small delay then auto-advance
+  setTimeout(() => {
+    if (state.answers[qIdx] === optIdx) next();
+  }, 360);
+}
+
+function renderSelfIdeology() {
+  setProgress("자기 평가", 85);
+  transitionTo(`
+    <div class="q-card">
+      <div class="eyebrow"><span class="dot"></span> Step 3 of 4 · 자기 평가</div>
+      <h2>스스로 생각하는 본인의 정치 성향을 선택해 주세요.</h2>
+      <p class="lead">아래 17개 문항에 대한 응답과 별개로, 평소 본인이 어느 성향에 가깝다고 인식하는지 골라주세요.</p>
+
+      <div class="options">
+        ${IDEOLOGY_OPTIONS.map((o, i) => `
+          <div class="option ${state.selfIdeology === i ? 'selected' : ''}" onclick="selectSelf(${i})">
+            ${escapeHtml(o.label)}
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="prev()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"/></svg>
+          이전
+        </button>
+        <button class="btn btn-primary" id="contBtn" onclick="next()" ${state.selfIdeology === null ? 'disabled' : ''}>
+          다음
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  `);
+}
+
+function selectSelf(i) {
+  state.selfIdeology = i;
+  document.querySelectorAll(".options .option").forEach((el, idx) => el.classList.toggle("selected", idx === i));
+  const c = document.getElementById("contBtn"); if (c) c.disabled = false;
+  setTimeout(() => { if (state.selfIdeology === i) next(); }, 360);
+}
+
+function renderJoinSecond() {
+  setProgress("2차 실험 안내", 95);
+
+  // 민사고가 아니면 2차 실험 단계 건너뛰고 바로 결과
+  if (state.schoolType !== "민사") {
+    state.joinSecond = false;
+    return renderResult();
+  }
+
+  transitionTo(`
+    <div class="q-card">
+      <div class="eyebrow"><span class="dot"></span> Step 4 of 4 · 2차 실험 참가</div>
+      <h2>답변 결과를 바탕으로 진행되는 2차 실험에 참가할 의향이 있으십니까?</h2>
+      <p class="lead">
+        <strong style="color:var(--text);">일시</strong> &nbsp;5월 30일 또는 31일<br/>
+        <strong style="color:var(--text);">시간</strong> &nbsp;약 30분 소요<br/>
+        <strong style="color:var(--text);">방식</strong> &nbsp;익명 오픈채팅방에서 다른 실험 참가자들과 대화
+      </p>
+
+      <div class="options">
+        <div class="option" onclick="selectJoin(true)">
+          <strong style="color:var(--text);">예</strong>, 2차 실험에 참가하겠습니다.
+        </div>
+        <div class="option" onclick="selectJoin(false)">
+          <strong style="color:var(--text);">아니오</strong>, 1차 설문까지만 참여하겠습니다.
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="prev()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"/></svg>
+          이전
+        </button>
+        <span></span>
+      </div>
+    </div>
+  `);
+}
+
+function selectJoin(v) {
+  state.joinSecond = v;
+  document.querySelectorAll(".options .option").forEach((el, idx) => {
+    el.classList.toggle("selected", (v && idx === 0) || (!v && idx === 1));
+  });
+  setTimeout(() => next(), 460);
+}
+
+/* ============================================================
+ *  결과 계산 & 화면
+ * ============================================================ */
+function computeResult() {
+  // 17문항 점수 평균
+  let sum = 0;
+  const catSums = { society: 0, economy: 0, security: 0 };
+  const catCnts = { society: 0, economy: 0, security: 0 };
+  QUESTIONS.forEach((q, i) => {
+    const s = q.opts[state.answers[i]].s;
+    sum += s;
+    catSums[q.cat] += s;
+    catCnts[q.cat] += 1;
+  });
+  const avg = sum / QUESTIONS.length;
+  const cat = avg < 2.5 ? "진보" :
+              avg < 5   ? "중도진보" :
+              avg < 7.5 ? "중도보수" : "보수";
+  return {
+    avg,
+    cat,
+    bySection: {
+      society: catSums.society / catCnts.society,
+      economy: catSums.economy / catCnts.economy,
+      security: catSums.security / catCnts.security,
+    },
+  };
+}
+
+function categoryColor(cat) {
+  return {
+    "진보":   "#3b82f6",
+    "중도진보":"#8b5cf6",
+    "중도보수":"#d946ef",
+    "보수":   "#ef4444",
+  }[cat];
+}
+
+function renderResult() {
+  // 민사고이면서 '예' 라고 답한 경우: 결과 안 보여주고 감사 화면
+  if (state.schoolType === "민사" && state.joinSecond === true) {
+    return renderThanks();
+  }
+  // 그 외(외부 학생 / 민사고 + 아니오) → 결과 화면
+
+  const r = computeResult();
+  state.finalCategory = r.cat;
+  setProgress("결과", 100);
+
+  const pos = (r.avg / 10) * 100;
+  const selfLabel = state.selfIdeology !== null ? IDEOLOGY_OPTIONS[state.selfIdeology].label : "—";
+
+  transitionTo(`
+    <div class="q-card" style="position:relative;">
+      <div class="hero-orb a" style="opacity:.35;"></div>
+      <div class="hero-orb b" style="opacity:.35;"></div>
+
+      <div class="eyebrow"><span class="dot" style="background:${categoryColor(r.cat)}; box-shadow:0 0 14px ${categoryColor(r.cat)};"></span> 1차 검사 결과 · Result</div>
+      <h1 style="margin-bottom:6px;">설문에 참여해주셔서 감사합니다.</h1>
+      <p class="lead">아래는 17개 문항 응답을 바탕으로 산출된 정치 성향 결과입니다.</p>
+
+      <div class="result-spectrum">
+        <div class="result-headline">
+          <div class="score">YOUR RESULT</div>
+          <div class="label" style="background: linear-gradient(90deg, #fff, ${categoryColor(r.cat)});
+            -webkit-background-clip:text; background-clip:text; color:transparent;">${r.cat}</div>
+          <div class="meta">평균 점수 <strong>${r.avg.toFixed(2)} / 10</strong> · 본인 인식 <strong>${escapeHtml(selfLabel)}</strong></div>
+        </div>
+
+        <div class="spectrum-bar" style="margin-top:24px;">
+          <div class="spectrum-marker" id="marker" style="left: 0%;"></div>
+        </div>
+        <div class="spectrum-labels">
+          <span>진보</span><span>중도진보</span><span>중도보수</span><span>보수</span>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <div class="breakdown-card">
+          <div class="name" style="color:#60a5fa;">사회</div>
+          <div class="val">${r.bySection.society.toFixed(2)}<span style="font-size:13px; color:var(--text-dim); font-weight:500;"> / 10</span></div>
+          <div class="mini-bar"><i data-w="${(r.bySection.society/10)*100}"></i></div>
+        </div>
+        <div class="breakdown-card">
+          <div class="name" style="color:#f59e0b;">경제</div>
+          <div class="val">${r.bySection.economy.toFixed(2)}<span style="font-size:13px; color:var(--text-dim); font-weight:500;"> / 10</span></div>
+          <div class="mini-bar"><i data-w="${(r.bySection.economy/10)*100}"></i></div>
+        </div>
+        <div class="breakdown-card">
+          <div class="name" style="color:#34d399;">안보</div>
+          <div class="val">${r.bySection.security.toFixed(2)}<span style="font-size:13px; color:var(--text-dim); font-weight:500;"> / 10</span></div>
+          <div class="mini-bar"><i data-w="${(r.bySection.security/10)*100}"></i></div>
+        </div>
+      </div>
+
+      <div class="self-compare">
+        ${renderSelfCompareText(r.cat, selfLabel)}
+      </div>
+
+      <div class="privacy-note" style="margin-top:18px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <p>본 결과는 연구의 일부로만 사용되며, 응답자의 익명성이 보장됩니다. 결과는 정치 성향에 대한 절대적 판정이 아닌, <strong>17개 문항 응답의 통계적 평균</strong>임을 알려드립니다.</p>
+      </div>
+
+      <div class="actions" style="margin-top:24px;">
+        <span></span>
+        <button class="btn btn-primary" onclick="copyShareText()">
+          결과 텍스트 복사
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        </button>
+      </div>
+    </div>
+  `);
+
+  // 애니메이션
+  setTimeout(() => {
+    document.getElementById("marker").style.left = pos + "%";
+    document.querySelectorAll(".mini-bar > i").forEach(b => {
+      const w = b.getAttribute("data-w");
+      requestAnimationFrame(() => { b.style.width = w + "%"; });
+    });
+  }, 400);
+}
+
+function renderSelfCompareText(cat, selfLabel) {
+  // 점수와 자기 인식의 차이를 가벼운 톤으로
+  const dict = ["진보", "중도에 가까운 진보", "중도", "중도에 가까운 보수", "보수"];
+  const selfIdx = dict.indexOf(selfLabel);
+  const catIdx = { "진보":0, "중도진보":1, "중도보수":3, "보수":4 }[cat];
+  if (selfIdx === -1) {
+    return `1차 검사 결과 본인의 응답은 <strong>${escapeHtml(cat)}</strong> 성향에 가깝게 분석되었습니다.`;
+  }
+  if (selfIdx === catIdx) {
+    return `평소 본인이 인식하시는 정치 성향과 1차 검사 결과가 거의 <strong>일치</strong>합니다. 응답이 매우 일관적이네요.`;
+  }
+  if (Math.abs(selfIdx - catIdx) === 1) {
+    return `본인이 인식하시는 정치 성향(<strong>${escapeHtml(selfLabel)}</strong>)과 1차 검사 결과(<strong>${escapeHtml(cat)}</strong>)가 <strong>가까운 편</strong>입니다.`;
+  }
+  return `본인이 인식하시는 정치 성향(<strong>${escapeHtml(selfLabel)}</strong>)과 1차 검사 결과(<strong>${escapeHtml(cat)}</strong>) 사이에 다소 차이가 있습니다. 본인이 평소 어떤 가치를 중요하게 여기는지 돌아보는 계기가 될 수 있겠네요.`;
+}
+
+function copyShareText() {
+  const r = computeResult();
+  const txt = `[「24시간!」 1차 검사 결과]
+정치 성향: ${r.cat} (${r.avg.toFixed(2)}/10)
+· 사회: ${r.bySection.society.toFixed(2)}
+· 경제: ${r.bySection.economy.toFixed(2)}
+· 안보: ${r.bySection.security.toFixed(2)}`;
+  navigator.clipboard.writeText(txt).then(() => {
+    showToast("결과 텍스트가 복사되었습니다.");
+  }).catch(() => {
+    showToast("복사에 실패했습니다.");
+  });
+}
+
+function showToast(msg) {
+  let t = document.getElementById("toast");
+  if (!t) {
+    t = document.createElement("div");
+    t.id = "toast";
+    t.style.cssText = `
+      position: fixed; left: 50%; bottom: 36px;
+      transform: translateX(-50%) translateY(20px);
+      padding: 12px 20px;
+      background: rgba(20,20,40,0.95);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 12px; color: #fff;
+      font-size: 14px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      opacity: 0; transition: opacity .3s, transform .3s;
+      z-index: 100; backdrop-filter: blur(10px);
+    `;
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  requestAnimationFrame(() => {
+    t.style.opacity = 1;
+    t.style.transform = "translateX(-50%) translateY(0)";
+  });
+  setTimeout(() => {
+    t.style.opacity = 0;
+    t.style.transform = "translateX(-50%) translateY(20px)";
+  }, 2200);
+}
+
+function renderThanks() {
+  setProgress("완료", 100);
+  transitionTo(`
+    <div class="q-card thanks-wrap">
+      <div class="thanks-emoji">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+      </div>
+      <h1 style="margin-bottom:10px;">감사합니다!</h1>
+      <p class="lead" style="text-align:center;">
+        1차 검사 응답이 정상적으로 제출되었습니다.<br/>
+        2차 실험은 <strong style="color:var(--text);">5월 30일 또는 31일</strong>에 진행되며, <br/>
+        구체적인 시간과 오픈채팅방 링크는 학번을 통해 개별 안내드릴 예정입니다.
+      </p>
+      <div class="meta-row" style="justify-content:center; margin: 24px 0 8px;">
+        <span class="chip">학번 <strong>&nbsp;${escapeHtml(state.studentId || "-")}</strong></span>
+        <span class="chip">자기인식 <strong>&nbsp;${escapeHtml(state.selfIdeology !== null ? IDEOLOGY_OPTIONS[state.selfIdeology].label : "-")}</strong></span>
+      </div>
+      <p style="color:var(--text-dim); font-size:13px; margin-top:18px;">
+        다시 한 번 연구에 참여해주셔서 진심으로 감사드립니다.<br/>
+        — 주제탐구 팀 「24시간!」 김예준 · 송경은 · 임성후 · 임유진
+      </p>
+    </div>
+  `);
+}
+
+/* ============================================================
+ *  네비게이션
+ * ============================================================ */
+function next() {
+  // step transitions
+  if (state.step === 0) { state.step = 1; return renderSchool(); }
+  if (state.step === 1) {
+    if (!state.schoolType) return;
+    if (state.schoolType === "민사" && !state.studentId) return;
+    if (state.schoolType === "기타" && !state.school) return;
+    state.step = 2; return renderQuestion(0);
+  }
+  if (state.step >= 2 && state.step <= 1 + QUESTIONS.length) {
+    const qIdx = state.step - 2;
+    if (state.answers[qIdx] === null) return;
+    state.step += 1;
+    if (state.step <= 1 + QUESTIONS.length) {
+      return renderQuestion(state.step - 2);
+    } else {
+      return renderSelfIdeology();
+    }
+  }
+  if (state.step === 2 + QUESTIONS.length) {
+    if (state.selfIdeology === null) return;
+    state.step += 1;
+    return renderJoinSecond();
+  }
+  if (state.step === 3 + QUESTIONS.length) {
+    state.step += 1;
+    if (state.schoolType === "민사" && state.joinSecond === true) {
+      return renderThanks();
+    } else {
+      return renderResult();
+    }
+  }
+}
+
+function prev() {
+  if (state.step <= 0) return;
+  state.step -= 1;
+  if (state.step === 0) return renderIntro();
+  if (state.step === 1) return renderSchool();
+  if (state.step >= 2 && state.step <= 1 + QUESTIONS.length) {
+    return renderQuestion(state.step - 2);
+  }
+  if (state.step === 2 + QUESTIONS.length) return renderSelfIdeology();
+  if (state.step === 3 + QUESTIONS.length) return renderJoinSecond();
+}
+
+/* expose to global */
+window.next = next;
+window.prev = prev;
+window.selectOption = selectOption;
+window.selectSelf = selectSelf;
+window.selectJoin = selectJoin;
+window.submitSchool = submitSchool;
+window.copyShareText = copyShareText;
+
+/* boot */
+renderIntro();
+</script>
+</body>
+</html>
