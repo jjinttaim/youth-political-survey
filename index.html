@@ -978,7 +978,7 @@ function renderQuestion(qIdx) {
 
   transitionTo(`
     <div class="q-card">
-      <div class="eyebrow cat-${q.cat}"><span class="dot"></span> ${escapeHtml(q.catLabel)} · ${q.num}번 / 총 ${total}문항 <span style="color:var(--text-dim); margin-left:6px;">· #${escapeHtml(q.tag)}</span></div>
+      <div class="eyebrow cat-${q.cat}"><span class="dot"></span> #${escapeHtml(q.tag)}</div>
       <h2>${escapeHtml(q.q)}</h2>
 
       <div class="options" id="opts">
