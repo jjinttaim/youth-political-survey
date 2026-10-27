@@ -791,7 +791,9 @@ const state = {
   // step 19: 본인 정치 성향
   // step 20: 2차 실험 참가 의사
   // step 21: 결과 (아니오) / 감사 (예)
-  answers: new Array(QUESTIONS.length).fill(null),
+  answers: new Array(QUESTIONS.length).fill(null), // 원래 선지 인덱스 (opts 기준)
+  // 문항별 선지 표시 순서 (원래 인덱스의 무작위 배열, 접속 시 한 번만 섞음)
+  optOrder: QUESTIONS.map(q => shuffle(q.opts.map((_, i) => i))),
   school: "",
   schoolType: "", // "민사" or "기타"
   studentId: "",
@@ -812,6 +814,15 @@ function setProgress(label, pct) {
   $progressLabel.textContent = label;
   $progressPct.textContent = Math.round(pct) + "%";
   $progressFill.style.width = pct + "%";
+}
+
+// Fisher–Yates 셔플 (원본 배열을 섞어서 반환)
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
 function escapeHtml(s) {
@@ -976,9 +987,9 @@ function renderQuestion(qIdx) {
       <h2>${escapeHtml(q.q)}</h2>
 
       <div class="options" id="opts">
-        ${q.opts.map((o, i) => `
+        ${state.optOrder[qIdx].map(i => `
           <div class="option ${selected !== null && state.answers[qIdx] === i ? 'selected' : ''}" data-i="${i}" onclick="selectOption(${qIdx}, ${i})">
-            ${escapeHtml(o.t)}
+            ${escapeHtml(q.opts[i].t)}
           </div>
         `).join("")}
       </div>
@@ -999,8 +1010,9 @@ function renderQuestion(qIdx) {
 
 function selectOption(qIdx, optIdx) {
   state.answers[qIdx] = optIdx;
-  document.querySelectorAll("#opts .option").forEach((el, i) => {
-    el.classList.toggle("selected", i === optIdx);
+  // 화면 순서가 섞여 있으므로 data-i(원래 인덱스)로 비교
+  document.querySelectorAll("#opts .option").forEach(el => {
+    el.classList.toggle("selected", Number(el.dataset.i) === optIdx);
   });
   const contBtn = document.getElementById("contBtn");
   if (contBtn) contBtn.disabled = false;
